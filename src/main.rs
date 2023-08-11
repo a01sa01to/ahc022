@@ -15,6 +15,7 @@ fn main() {
         stdev: u32,
         exit_cells: [(u32, u32); num_exit]
     };
+    let stdev = stdev as f64;
     let max_temp = 1000;
 
     for i in 0..grid_size {
@@ -35,7 +36,7 @@ fn main() {
     }
 
     // measure
-    let mut ans = vec![(0, 0); num_exit];
+    let mut measure_res = vec![Vec::<i32>::new(); num_exit];
     let max_measure = 10000;
     for turn in 0..max_measure {
         println!("{} {} {}", turn % num_exit, 0, 0);
@@ -46,22 +47,25 @@ fn main() {
         if measure_result == -1 {
             exit(0);
         }
-        ans[turn % num_exit].0 += measure_result;
-        ans[turn % num_exit].1 += 1;
+        measure_res[turn % num_exit].push(measure_result);
     }
 
     // output
     println!("-1 -1 -1");
     for i in 0..num_exit {
-        let measure = ans[i].0 as f64 / ans[i].1 as f64;
-        let mut minim = (1e9, 0);
+        let mut ans = (0.0, 0);
         for x in 0..num_exit {
+            let mut prob = 1.0;
             let temp = max_temp * (x + 1) / num_exit;
-            let diff = (measure - temp as f64).abs();
-            if minim.0 > diff {
-                minim = (diff, x);
+            for j in 0..measure_res[i].len() {
+                let diff = (measure_res[i][j] - temp as i32) as f64;
+                prob *= (-(diff * diff) / (2.0 * (stdev * stdev))).exp();
+            }
+            if prob > ans.0 {
+                ans = (prob, x);
             }
         }
-        println!("{}", minim.1);
+        eprintln!("{} {}", ans.0, ans.1);
+        println!("{}", ans.1);
     }
 }
