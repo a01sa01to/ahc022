@@ -15,7 +15,7 @@ echo Running Test 0...
 ./target/release/tester ../target/debug/a < in/0.txt 1> out/0.txt 2> err/0.txt
 # echo Running visualizer...
 ./target/release/vis in/0.txt out/0.txt &> res/0.txt
-cat err/0.txt
+cat res/0.txt
 cd ..
 
 
