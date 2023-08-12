@@ -18,14 +18,14 @@ fn main() {
     };
 
     let mut temps = vec![vec![-1; grid_size]; grid_size];
-    let mut tem = 3 * stdev;
+    let mut tem = stdev;
     // ふつうに埋めるパート
     for i in 0..grid_size {
         for j in 0..grid_size {
             for x in exit_cells.iter() {
                 if (i, j) == *x {
                     temps[i][j] = tem;
-                    tem += 6 * stdev;
+                    tem += 2 * stdev;
                 }
             }
         }
@@ -99,7 +99,7 @@ fn main() {
 
     // measure
     let mut measure_res = vec![Vec::<i32>::new(); num_exit];
-    for turn in 0..num_exit {
+    for turn in 0..6 * num_exit {
         println!("{} {} {}", turn % num_exit, 0, 0);
         input! {
             from &mut source,
