@@ -1,6 +1,7 @@
 use proconio::{input, source::line::LineSource};
 use std::{
     io::{stdin, BufReader},
+    mem,
     process::exit,
 };
 
@@ -38,6 +39,7 @@ fn main() {
         }
     }
     // 線形補間
+    let mut transposed = false;
     loop {
         let mut changed = false;
         for i in 0..grid_size {
@@ -48,7 +50,7 @@ fn main() {
                 }
                 v.push((temps[i][j], j));
             }
-            if v.len() > 1 {
+            if v.len() > 1 && v.len() < grid_size {
                 for x in 0..v.len() {
                     let diff = v[(x + 1) % v.len()].0 - v[x].0;
                     let nxtidx = v[(x + 1) % v.len()].1
@@ -66,7 +68,17 @@ fn main() {
                 changed = true;
             }
         }
-        break;
+        if !transposed && !changed {
+            break;
+        }
+        let mut nxttemps = vec![vec![0; grid_size]; grid_size];
+        for i in 0..grid_size {
+            for j in 0..grid_size {
+                nxttemps[j][i] = temps[i][j];
+            }
+        }
+        mem::swap(&mut temps, &mut nxttemps);
+        transposed = !transposed;
     }
 
     // output temps
@@ -78,19 +90,19 @@ fn main() {
     }
 
     // measure
-    let mut measure_res = vec![Vec::<i32>::new(); num_exit];
-    let max_measure = 10000;
-    for turn in 0..max_measure {
-        println!("{} {} {}", turn % num_exit, 0, 0);
-        input! {
-            from &mut source,
-            measure_result: i32
-        };
-        if measure_result == -1 {
-            exit(0);
-        }
-        measure_res[turn % num_exit].push(measure_result);
-    }
+    // let mut measure_res = vec![Vec::<i32>::new(); num_exit];
+    // let max_measure = 10000;
+    // for turn in 0..max_measure {
+    //     println!("{} {} {}", turn % num_exit, 0, 0);
+    //     input! {
+    //         from &mut source,
+    //         measure_result: i32
+    //     };
+    //     if measure_result == -1 {
+    //         exit(0);
+    //     }
+    //     measure_res[turn % num_exit].push(measure_result);
+    // }
 
     // output
     println!("-1 -1 -1");
