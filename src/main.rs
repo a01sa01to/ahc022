@@ -18,14 +18,14 @@ fn main() {
     };
 
     let mut temps = vec![vec![-1; grid_size]; grid_size];
-    let mut tem = 2 * stdev;
+    let mut tem = 3 * stdev;
     // ふつうに埋めるパート
     for i in 0..grid_size {
         for j in 0..grid_size {
             for x in exit_cells.iter() {
                 if (i, j) == *x {
                     temps[i][j] = tem;
-                    tem += 4 * stdev;
+                    tem += 6 * stdev;
                 }
             }
         }
@@ -89,37 +89,44 @@ fn main() {
         println!("");
     }
 
+    if tem > 1000 {
+        println!("-1 -1 -1");
+        for _ in 0..num_exit {
+            println!("0");
+        }
+        return;
+    }
+
     // measure
-    // let mut measure_res = vec![Vec::<i32>::new(); num_exit];
-    // let max_measure = 10000;
-    // for turn in 0..max_measure {
-    //     println!("{} {} {}", turn % num_exit, 0, 0);
-    //     input! {
-    //         from &mut source,
-    //         measure_result: i32
-    //     };
-    //     if measure_result == -1 {
-    //         exit(0);
-    //     }
-    //     measure_res[turn % num_exit].push(measure_result);
-    // }
+    let mut measure_res = vec![Vec::<i32>::new(); num_exit];
+    for turn in 0..num_exit {
+        println!("{} {} {}", turn % num_exit, 0, 0);
+        input! {
+            from &mut source,
+            measure_result: i32
+        };
+        if measure_result == -1 {
+            exit(0);
+        }
+        measure_res[turn % num_exit].push(measure_result);
+    }
 
     // output
     println!("-1 -1 -1");
     for i in 0..num_exit {
-        // let mut ans = (0.0, 0);
-        // for x in 0..num_exit {
-        //     let mut prob = 1.0;
-        //     let temp = max_temp * (x + 1) / num_exit;
-        //     for j in 0..measure_res[i].len() {
-        //         let diff = (measure_res[i][j] - temp as i32) as f64;
-        //         prob *= (-(diff * diff) / (2.0 * (stdev * stdev))).exp();
-        //     }
-        //     if prob > ans.0 {
-        //         ans = (prob, x);
-        //     }
-        // }
-        // eprintln!("{} {}", ans.0, ans.1);
-        println!("{}", 0);
+        let mut ans = (0.0, 0);
+        for x in 0..num_exit {
+            let mut prob = 1.0;
+            let temp = temps[exit_cells[x].0][exit_cells[x].1];
+            for j in 0..measure_res[i].len() {
+                let diff = (measure_res[i][j] - temp as i32) as f64;
+                prob *= (-(diff * diff) / (2 * (stdev * stdev)) as f64).exp();
+            }
+            if prob > ans.0 {
+                ans = (prob, x);
+            }
+        }
+        eprintln!("{} {}", ans.0, ans.1);
+        println!("{}", ans.1);
     }
 }
