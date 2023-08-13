@@ -195,6 +195,30 @@ fn strategy2(
     }
 }
 
+fn strategy3(
+    source: &mut LineSource<BufReader<StdinLock<'_>>>,
+    grid_size: usize,
+    num_exit: usize,
+    stdev: i32,
+    exit_cells: Vec<(usize, usize)>,
+) {
+    println!("# strategy3");
+    let mut temps = vec![vec![0; grid_size]; grid_size];
+    // output temps
+    for i in 0..grid_size {
+        for j in 0..grid_size {
+            print!("{} ", temps[i][j].min(1000).max(0));
+        }
+        println!("");
+    }
+    // output results
+    let mut ans = vec![0; num_exit];
+    println!("-1 -1 -1");
+    for i in 0..num_exit {
+        println!("{}", ans[i]);
+    }
+}
+
 fn main() {
     let stdin = stdin();
     let mut source = LineSource::new(BufReader::new(stdin.lock()));
@@ -209,7 +233,9 @@ fn main() {
 
     if 1000 >= (num_exit * 2 + 1) as i32 * stdev {
         strategy1(&mut source, grid_size, num_exit, stdev, exit_cells);
-    } else {
+    } else if stdev < 400 {
         strategy2(&mut source, grid_size, num_exit, stdev, exit_cells);
+    } else {
+        strategy3(&mut source, grid_size, num_exit, stdev, exit_cells);
     }
 }
