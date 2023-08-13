@@ -177,11 +177,9 @@ fn strategy2(
                 if measure_result == -1 {
                     exit(0);
                 }
-                if measure_result > temps[center.0][center.1] / 2 {
-                    cnt += 1;
-                }
+                cnt += measure_result;
             }
-            if cnt >= 2 {
+            if cnt >= temps[center.0][center.1] * 3 / 2 {
                 ans[i] = j;
                 remaining.remove(&j);
                 break;
