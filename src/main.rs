@@ -17,18 +17,20 @@ fn main() {
         exit_cells: [(usize, usize); num_exit]
     };
 
+    let mut exit_cells_ordered = exit_cells.clone();
+    exit_cells_ordered.sort_by(|a, b| {
+        ((a.0 as i32 - grid_size as i32 / 2).abs() + (a.1 as i32 - grid_size as i32 / 2).abs()).cmp(
+            &((b.0 as i32 - grid_size as i32 / 2).abs()
+                + (b.1 as i32 - grid_size as i32 / 2).abs()),
+        )
+    });
+
     let mut temps = vec![vec![-1; grid_size]; grid_size];
     let mut tem = stdev;
     // ふつうに埋めるパート
-    for i in 0..grid_size {
-        for j in 0..grid_size {
-            for x in exit_cells.iter() {
-                if (i, j) == *x {
-                    temps[i][j] = tem;
-                    tem += 2 * stdev;
-                }
-            }
-        }
+    for (i, j) in exit_cells_ordered.iter() {
+        temps[*i][*j] = tem;
+        tem += 2 * stdev;
     }
     // もし誤差が出るようであれば全部 0
     if tem > 1000 {
