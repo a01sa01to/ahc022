@@ -78,14 +78,6 @@ fn strategy1(
         temps[*i][*j] = tem;
         tem += 2 * stdev;
     }
-    // もし1000を超えるようであれば全部 0
-    if tem > 1000 {
-        for (i, j) in exit_cells_ordered.iter() {
-            // if temps[*i][*j] > 1000 {
-            temps[*i][*j] = 0;
-            // }
-        }
-    }
     // 線形補間
     let temps_yoko = linear_completion(&temps);
     let temps_tate = transpose(&linear_completion(&transpose(&temps)));
@@ -101,14 +93,6 @@ fn strategy1(
             print!("{} ", temps[i][j].min(1000).max(0));
         }
         println!("");
-    }
-
-    if tem > 1000 {
-        println!("-1 -1 -1");
-        for _ in 0..num_exit {
-            println!("0");
-        }
-        return;
     }
 
     // measure
@@ -145,6 +129,29 @@ fn strategy1(
     }
 }
 
+fn strategy2(
+    source: &mut LineSource<BufReader<StdinLock<'_>>>,
+    grid_size: usize,
+    num_exit: usize,
+    stdev: i32,
+    exit_cells: Vec<(usize, usize)>,
+) {
+    let temps = vec![vec![0; grid_size]; grid_size];
+
+    // output temps
+    for i in 0..grid_size {
+        for j in 0..grid_size {
+            print!("{} ", temps[i][j].min(1000).max(0));
+        }
+        println!("");
+    }
+
+    println!("-1 -1 -1");
+    for _ in 0..num_exit {
+        println!("0");
+    }
+}
+
 fn main() {
     let stdin = stdin();
     let mut source = LineSource::new(BufReader::new(stdin.lock()));
@@ -157,5 +164,9 @@ fn main() {
         exit_cells: [(usize, usize); num_exit]
     };
 
-    strategy1(&mut source, grid_size, num_exit, stdev, exit_cells);
+    if 1000 >= (num_exit * 2 + 1) as i32 * stdev {
+        strategy1(&mut source, grid_size, num_exit, stdev, exit_cells);
+    } else {
+        strategy2(&mut source, grid_size, num_exit, stdev, exit_cells);
+    }
 }
