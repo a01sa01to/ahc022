@@ -1,5 +1,6 @@
 use proconio::{input, source::line::LineSource};
 use std::{
+    collections::HashSet,
     io::{stdin, BufReader, StdinLock},
     mem,
     process::exit,
@@ -63,6 +64,7 @@ fn strategy1(
     stdev: i32,
     exit_cells: Vec<(usize, usize)>,
 ) {
+    println!("# strategy1");
     let mut exit_cells_ordered = exit_cells.clone();
     exit_cells_ordered.sort_by(|a, b| {
         ((a.0 as i32 - grid_size as i32 / 2).abs() + (a.1 as i32 - grid_size as i32 / 2).abs()).cmp(
@@ -136,7 +138,10 @@ fn strategy2(
     stdev: i32,
     exit_cells: Vec<(usize, usize)>,
 ) {
-    let temps = vec![vec![0; grid_size]; grid_size];
+    println!("# strategy2");
+    let mut temps = vec![vec![0; grid_size]; grid_size];
+    let center = (grid_size / 2, grid_size / 2);
+    temps[center.0][center.1] = 1000;
 
     // output temps
     for i in 0..grid_size {
@@ -146,9 +151,49 @@ fn strategy2(
         println!("");
     }
 
+    // measure
+    let mut ans = vec![0; num_exit];
+    let mut remaining = HashSet::<usize>::new();
+    for i in 0..num_exit {
+        remaining.insert(i);
+    }
+    for i in 0..num_exit - 1 {
+        for j in 0..num_exit {
+            if !remaining.contains(&j) {
+                continue;
+            }
+            let mut cnt = 0;
+            for _ in 0..3 {
+                println!(
+                    "{} {} {}",
+                    i,
+                    center.0 as i32 - exit_cells[j].0 as i32,
+                    center.1 as i32 - exit_cells[j].1 as i32
+                );
+                input! {
+                    from &mut *source,
+                    measure_result: i32
+                };
+                if measure_result == -1 {
+                    exit(0);
+                }
+                if measure_result > 500 {
+                    cnt += 1;
+                }
+            }
+            if cnt >= 2 {
+                ans[i] = j;
+                remaining.remove(&j);
+                break;
+            }
+        }
+    }
+    ans[num_exit - 1] = *remaining.iter().next().unwrap();
+
+    // output results
     println!("-1 -1 -1");
-    for _ in 0..num_exit {
-        println!("0");
+    for i in 0..num_exit {
+        println!("{}", ans[i]);
     }
 }
 
