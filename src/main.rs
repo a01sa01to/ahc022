@@ -141,7 +141,7 @@ fn strategy2(
     println!("# strategy2");
     let mut temps = vec![vec![0; grid_size]; grid_size];
     let center = (grid_size / 2, grid_size / 2);
-    temps[center.0][center.1] = (6 * stdev).min(1000);
+    temps[center.0][center.1] = (5 * stdev).min(1000);
 
     // output temps
     for i in 0..grid_size {
