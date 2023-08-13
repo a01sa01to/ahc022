@@ -1,5 +1,6 @@
 use num_integer::Roots;
 use proconio::{input, source::line::LineSource};
+use rand::seq::SliceRandom;
 use std::{
     collections::HashSet,
     io::{stdin, BufReader, StdinLock},
@@ -167,8 +168,12 @@ fn strategy2(
     for i in 0..num_exit {
         remaining.insert(i);
     }
+    let mut rng = rand::thread_rng();
+    let mut perm = (0..num_exit).collect::<Vec<usize>>();
     for i in 0..num_exit - 1 {
-        for j in 0..num_exit {
+        perm.shuffle(&mut rng);
+        for _j in 0..num_exit {
+            let j = perm[_j];
             if !remaining.contains(&j) {
                 continue;
             }
