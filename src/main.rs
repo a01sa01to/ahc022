@@ -5,6 +5,57 @@ use std::{
     process::exit,
 };
 
+fn transpose(temps: &Vec<Vec<i32>>) -> Vec<Vec<i32>> {
+    let mut nxttemps = vec![vec![0; temps.len()]; temps.len()];
+    for i in 0..temps.len() {
+        for j in 0..temps.len() {
+            nxttemps[j][i] = temps[i][j];
+        }
+    }
+    return nxttemps;
+}
+
+fn linear_completion(_temps: &Vec<Vec<i32>>) -> Vec<Vec<i32>> {
+    let mut temps = _temps.clone();
+    let mut transposed = false;
+    loop {
+        let mut changed = false;
+        for i in 0.._temps.len() {
+            let mut v = Vec::<(i32, usize)>::new();
+            for j in 0.._temps.len() {
+                if temps[i][j] == -1 {
+                    continue;
+                }
+                v.push((temps[i][j], j));
+            }
+            if v.len() > 1 && v.len() < _temps.len() {
+                for x in 0..v.len() {
+                    let diff = v[(x + 1) % v.len()].0 - v[x].0;
+                    let nxtidx = v[(x + 1) % v.len()].1
+                        + if v[(x + 1) % v.len()].1 > v[x].1 {
+                            0
+                        } else {
+                            _temps.len()
+                        };
+                    let difflen = nxtidx - v[x].1;
+                    for j in v[x].1 + 1..nxtidx {
+                        temps[i][j % _temps.len()] =
+                            v[x].0 + diff * (j - v[x].1) as i32 / difflen as i32;
+                    }
+                }
+                changed = true;
+            }
+        }
+        if !transposed && !changed {
+            break;
+        }
+        let mut nxttemps = transpose(&temps);
+        mem::swap(&mut temps, &mut nxttemps);
+        transposed = !transposed;
+    }
+    return temps;
+}
+
 fn main() {
     let stdin = stdin();
     let mut source = LineSource::new(BufReader::new(stdin.lock()));
@@ -32,55 +83,21 @@ fn main() {
         temps[*i][*j] = tem;
         tem += 2 * stdev;
     }
-    // もし誤差が出るようであれば全部 0
+    // もし1000を超えるようであれば全部 0
     if tem > 1000 {
-        for i in 0..grid_size {
-            for j in 0..grid_size {
-                temps[i][j] = 0;
-            }
+        for (i, j) in exit_cells_ordered.iter() {
+            // if temps[*i][*j] > 1000 {
+            temps[*i][*j] = 0;
+            // }
         }
     }
     // 線形補間
-    let mut transposed = false;
-    loop {
-        let mut changed = false;
-        for i in 0..grid_size {
-            let mut v = Vec::<(i32, usize)>::new();
-            for j in 0..grid_size {
-                if temps[i][j] == -1 {
-                    continue;
-                }
-                v.push((temps[i][j], j));
-            }
-            if v.len() > 1 && v.len() < grid_size {
-                for x in 0..v.len() {
-                    let diff = v[(x + 1) % v.len()].0 - v[x].0;
-                    let nxtidx = v[(x + 1) % v.len()].1
-                        + if v[(x + 1) % v.len()].1 > v[x].1 {
-                            0
-                        } else {
-                            grid_size
-                        };
-                    let difflen = nxtidx - v[x].1;
-                    for j in v[x].1 + 1..nxtidx {
-                        temps[i][j % grid_size] =
-                            v[x].0 + diff * (j - v[x].1) as i32 / difflen as i32;
-                    }
-                }
-                changed = true;
-            }
+    let temps_yoko = linear_completion(&temps);
+    let temps_tate = transpose(&linear_completion(&transpose(&temps)));
+    for i in 0..grid_size {
+        for j in 0..grid_size {
+            temps[i][j] = (temps_yoko[i][j] + temps_tate[i][j]) / 2;
         }
-        if !transposed && !changed {
-            break;
-        }
-        let mut nxttemps = vec![vec![0; grid_size]; grid_size];
-        for i in 0..grid_size {
-            for j in 0..grid_size {
-                nxttemps[j][i] = temps[i][j];
-            }
-        }
-        mem::swap(&mut temps, &mut nxttemps);
-        transposed = !transposed;
     }
 
     // output temps
