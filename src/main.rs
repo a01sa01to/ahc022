@@ -1,6 +1,6 @@
 use proconio::{input, source::line::LineSource};
 use std::{
-    io::{stdin, BufReader},
+    io::{stdin, BufReader, StdinLock},
     mem,
     process::exit,
 };
@@ -56,18 +56,13 @@ fn linear_completion(_temps: &Vec<Vec<i32>>) -> Vec<Vec<i32>> {
     return temps;
 }
 
-fn main() {
-    let stdin = stdin();
-    let mut source = LineSource::new(BufReader::new(stdin.lock()));
-
-    input! {
-        from &mut source,
-        grid_size: usize,
-        num_exit: usize,
-        stdev: i32,
-        exit_cells: [(usize, usize); num_exit]
-    };
-
+fn strategy1(
+    source: &mut LineSource<BufReader<StdinLock<'_>>>,
+    grid_size: usize,
+    num_exit: usize,
+    stdev: i32,
+    exit_cells: Vec<(usize, usize)>,
+) {
     let mut exit_cells_ordered = exit_cells.clone();
     exit_cells_ordered.sort_by(|a, b| {
         ((a.0 as i32 - grid_size as i32 / 2).abs() + (a.1 as i32 - grid_size as i32 / 2).abs()).cmp(
@@ -121,7 +116,7 @@ fn main() {
     for turn in 0..6 * num_exit {
         println!("{} {} {}", turn % num_exit, 0, 0);
         input! {
-            from &mut source,
+            from &mut *source,
             measure_result: i32
         };
         if measure_result == -1 {
@@ -148,4 +143,19 @@ fn main() {
         eprintln!("{} {}", ans.0, ans.1);
         println!("{}", ans.1);
     }
+}
+
+fn main() {
+    let stdin = stdin();
+    let mut source = LineSource::new(BufReader::new(stdin.lock()));
+
+    input! {
+        from &mut source,
+        grid_size: usize,
+        num_exit: usize,
+        stdev: i32,
+        exit_cells: [(usize, usize); num_exit]
+    };
+
+    strategy1(&mut source, grid_size, num_exit, stdev, exit_cells);
 }
