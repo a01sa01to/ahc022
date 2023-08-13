@@ -6,6 +6,20 @@ use std::{
     process::exit,
 };
 
+fn measure(i: usize, x: i32, y: i32, source: &mut LineSource<BufReader<StdinLock<'_>>>) -> i32 {
+    static mut COUNT: usize = 0;
+    unsafe { COUNT += 1 };
+    if unsafe { COUNT } > 10000 {
+        return -1;
+    }
+    println!("{} {} {}", i, x, y);
+    input! {
+        from &mut *source,
+        measure_result: i32
+    };
+    return measure_result;
+}
+
 fn transpose(temps: &Vec<Vec<i32>>) -> Vec<Vec<i32>> {
     let mut nxttemps = vec![vec![0; temps.len()]; temps.len()];
     for i in 0..temps.len() {
@@ -100,13 +114,9 @@ fn strategy1(
     // measure
     let mut measure_res = vec![Vec::<i32>::new(); num_exit];
     for turn in 0..6 * num_exit {
-        println!("{} {} {}", turn % num_exit, 0, 0);
-        input! {
-            from &mut *source,
-            measure_result: i32
-        };
+        let measure_result = measure(turn % num_exit, 0, 0, source);
         if measure_result == -1 {
-            exit(0);
+            continue;
         }
         measure_res[turn % num_exit].push(measure_result);
     }
@@ -164,18 +174,14 @@ fn strategy2(
             }
             let mut cnt = 0;
             for _ in 0..3 {
-                println!(
-                    "{} {} {}",
+                let measure_result = measure(
                     i,
                     center.0 as i32 - exit_cells[j].0 as i32,
-                    center.1 as i32 - exit_cells[j].1 as i32
+                    center.1 as i32 - exit_cells[j].1 as i32,
+                    source,
                 );
-                input! {
-                    from &mut *source,
-                    measure_result: i32
-                };
                 if measure_result == -1 {
-                    exit(0);
+                    continue;
                 }
                 cnt += measure_result;
             }
