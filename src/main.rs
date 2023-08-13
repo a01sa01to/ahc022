@@ -1,9 +1,9 @@
+use num_integer::Roots;
 use proconio::{input, source::line::LineSource};
 use std::{
     collections::HashSet,
     io::{stdin, BufReader, StdinLock},
     mem,
-    process::exit,
 };
 
 fn measure(i: usize, x: i32, y: i32, source: &mut LineSource<BufReader<StdinLock<'_>>>) -> i32 {
@@ -173,7 +173,8 @@ fn strategy2(
                 continue;
             }
             let mut cnt = 0;
-            for _ in 0..3 {
+            let num_measure = (stdev.sqrt() / 4).max(3);
+            for _ in 0..num_measure {
                 let measure_result = measure(
                     i,
                     center.0 as i32 - exit_cells[j].0 as i32,
@@ -185,7 +186,7 @@ fn strategy2(
                 }
                 cnt += measure_result;
             }
-            if cnt >= temps[center.0][center.1] * 3 / 2 {
+            if cnt >= temps[center.0][center.1] * num_measure / 2 {
                 ans[i] = j;
                 remaining.remove(&j);
                 break;
@@ -201,27 +202,25 @@ fn strategy2(
     }
 }
 
-fn strategy3(
-    source: &mut LineSource<BufReader<StdinLock<'_>>>,
+fn _strategy3(
+    _source: &mut LineSource<BufReader<StdinLock<'_>>>,
     grid_size: usize,
     num_exit: usize,
-    stdev: i32,
-    exit_cells: Vec<(usize, usize)>,
+    _stdev: i32,
+    _exit_cells: Vec<(usize, usize)>,
 ) {
     println!("# strategy3");
-    let mut temps = vec![vec![0; grid_size]; grid_size];
     // output temps
-    for i in 0..grid_size {
-        for j in 0..grid_size {
-            print!("{} ", temps[i][j].min(1000).max(0));
+    for _ in 0..grid_size {
+        for __ in 0..grid_size {
+            print!("0 ");
         }
         println!("");
     }
     // output results
-    let mut ans = vec![0; num_exit];
     println!("-1 -1 -1");
-    for i in 0..num_exit {
-        println!("{}", ans[i]);
+    for _ in 0..num_exit {
+        println!("0");
     }
 }
 
@@ -239,9 +238,10 @@ fn main() {
 
     if 1000 >= (num_exit * 2 + 1) as i32 * stdev {
         strategy1(&mut source, grid_size, num_exit, stdev, exit_cells);
-    } else if stdev < 400 {
-        strategy2(&mut source, grid_size, num_exit, stdev, exit_cells);
+    // } else if stdev < 400 {
     } else {
-        strategy3(&mut source, grid_size, num_exit, stdev, exit_cells);
+        strategy2(&mut source, grid_size, num_exit, stdev, exit_cells);
+        // } else {
+        //     strategy3(&mut source, grid_size, num_exit, stdev, exit_cells);
     }
 }
