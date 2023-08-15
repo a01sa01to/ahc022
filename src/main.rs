@@ -152,7 +152,7 @@ fn strategy2(
     println!("# strategy2");
     let mut temps = vec![vec![0; grid_size]; grid_size];
     let center = (grid_size / 2, grid_size / 2);
-    temps[center.0][center.1] = (6 * stdev).min(1000);
+    temps[center.0][center.1] = (10 * stdev).min(1000);
 
     // output temps
     for i in 0..grid_size {
@@ -180,7 +180,7 @@ fn strategy2(
                 + (exit_cells[*b].1 as i32 - center.1 as i32).abs()),
         )
     });
-    for i in 0..num_exit - 1 {
+    for i in 0..num_exit {
         perm.shuffle(&mut rng);
         for _j in 0..num_exit {
             let j = perm[_j];
@@ -212,7 +212,6 @@ fn strategy2(
             }
         }
     }
-    ans[*remaining.iter().next().unwrap()] = ordered_exitidx[num_exit - 1];
 
     // output results
     println!("-1 -1 -1");
@@ -255,12 +254,12 @@ fn main() {
         exit_cells: [(usize, usize); num_exit]
     };
 
-    if 1000 >= (num_exit * 2 + 1) as i32 * stdev {
-        strategy1(&mut source, grid_size, num_exit, stdev, exit_cells);
+    // if 1000 >= (num_exit * 2 + 1) as i32 * stdev {
+    //     strategy1(&mut source, grid_size, num_exit, stdev, exit_cells);
     // } else if stdev < 400 {
-    } else {
-        strategy2(&mut source, grid_size, num_exit, stdev, exit_cells);
-        // } else {
-        //     strategy3(&mut source, grid_size, num_exit, stdev, exit_cells);
-    }
+    // } else {
+    strategy2(&mut source, grid_size, num_exit, stdev, exit_cells);
+    // } else {
+    //     strategy3(&mut source, grid_size, num_exit, stdev, exit_cells);
+    // }
 }
