@@ -181,8 +181,7 @@ fn strategy2(
     });
     for i in 0..num_exit - 1 {
         // perm.shuffle(&mut rng);
-        for _j in 0..num_exit {
-            let j = perm[_j];
+        for j in 0..num_exit {
             if !remaining.contains(&j) {
                 continue;
             }
@@ -191,8 +190,8 @@ fn strategy2(
             for _ in 0..num_measure {
                 let measure_result = measure(
                     j,
-                    center.0 as i32 - exit_cells[i].0 as i32,
-                    center.1 as i32 - exit_cells[i].1 as i32,
+                    center.0 as i32 - exit_cells[perm[i]].0 as i32,
+                    center.1 as i32 - exit_cells[perm[i]].1 as i32,
                     source,
                 );
                 if measure_result == -1 {
@@ -201,13 +200,13 @@ fn strategy2(
                 cnt += measure_result;
             }
             if cnt >= temps[center.0][center.1] * num_measure / 2 {
-                ans[j] = i;
+                ans[j] = perm[i];
                 remaining.remove(&j);
                 break;
             }
         }
     }
-    ans[*remaining.iter().next().unwrap()] = num_exit - 1;
+    ans[*remaining.iter().next().unwrap()] = perm[num_exit - 1];
 
     // output results
     println!("-1 -1 -1");
