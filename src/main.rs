@@ -169,9 +169,10 @@ fn strategy2(
         remaining.insert(i);
     }
 
-    // let mut rng = rand::thread_rng();
+    let mut rng = rand::thread_rng();
+    let mut ordered_exitidx = (0..num_exit).collect::<Vec<usize>>();
     let mut perm = (0..num_exit).collect::<Vec<usize>>();
-    perm.sort_by(|a, b| {
+    ordered_exitidx.sort_by(|a, b| {
         ((exit_cells[*a].0 as i32 - center.0 as i32).abs()
             + (exit_cells[*a].1 as i32 - center.1 as i32).abs())
         .cmp(
@@ -180,8 +181,9 @@ fn strategy2(
         )
     });
     for i in 0..num_exit - 1 {
-        // perm.shuffle(&mut rng);
-        for j in 0..num_exit {
+        perm.shuffle(&mut rng);
+        for _j in 0..num_exit {
+            let j = perm[_j];
             if !remaining.contains(&j) {
                 continue;
             }
@@ -190,8 +192,8 @@ fn strategy2(
             for _ in 0..num_measure {
                 let measure_result = measure(
                     j,
-                    center.0 as i32 - exit_cells[perm[i]].0 as i32,
-                    center.1 as i32 - exit_cells[perm[i]].1 as i32,
+                    center.0 as i32 - exit_cells[ordered_exitidx[i]].0 as i32,
+                    center.1 as i32 - exit_cells[ordered_exitidx[i]].1 as i32,
                     source,
                 );
                 if measure_result == -1 {
@@ -200,13 +202,13 @@ fn strategy2(
                 cnt += measure_result;
             }
             if cnt >= temps[center.0][center.1] * num_measure / 2 {
-                ans[j] = perm[i];
+                ans[j] = ordered_exitidx[i];
                 remaining.remove(&j);
                 break;
             }
         }
     }
-    ans[*remaining.iter().next().unwrap()] = perm[num_exit - 1];
+    ans[*remaining.iter().next().unwrap()] = ordered_exitidx[num_exit - 1];
 
     // output results
     println!("-1 -1 -1");
