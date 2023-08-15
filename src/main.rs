@@ -188,7 +188,11 @@ fn strategy2(
                 continue;
             }
             let mut cnt = 0;
-            let num_measure = (stdev.sqrt() / 4).max(3);
+            let num_measure = if temps[center.0][center.1] < 1000 {
+                1
+            } else {
+                (stdev.sqrt() / 4).max(3)
+            };
             for _ in 0..num_measure {
                 let measure_result = measure(
                     j,
