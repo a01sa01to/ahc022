@@ -1,4 +1,3 @@
-use num_integer::Roots;
 use proconio::{input, source::line::LineSource};
 use rand::seq::SliceRandom;
 use std::{
@@ -70,13 +69,7 @@ fn main() {
                 continue;
             }
             let mut cnt = 0;
-            let num_measure = if temps[center.0][center.1] <= 1000 {
-                // s <= 100 (1/3 ケース)
-                1
-            } else {
-                // s > 100 (2/3 ケース)
-                (stdev.sqrt() / 4).max(3)
-            };
+            let num_measure = (stdev + 99) / 100;
             for _ in 0..num_measure {
                 let measure_result = measure(
                     j,
