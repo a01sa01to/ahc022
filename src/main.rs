@@ -168,10 +168,19 @@ fn strategy2(
     for i in 0..num_exit {
         remaining.insert(i);
     }
-    let mut rng = rand::thread_rng();
+
+    // let mut rng = rand::thread_rng();
     let mut perm = (0..num_exit).collect::<Vec<usize>>();
+    perm.sort_by(|a, b| {
+        ((exit_cells[*a].0 as i32 - center.0 as i32).abs()
+            + (exit_cells[*a].1 as i32 - center.1 as i32).abs())
+        .cmp(
+            &((exit_cells[*b].0 as i32 - center.0 as i32).abs()
+                + (exit_cells[*b].1 as i32 - center.1 as i32).abs()),
+        )
+    });
     for i in 0..num_exit - 1 {
-        perm.shuffle(&mut rng);
+        // perm.shuffle(&mut rng);
         for _j in 0..num_exit {
             let j = perm[_j];
             if !remaining.contains(&j) {
@@ -181,9 +190,9 @@ fn strategy2(
             let num_measure = (stdev.sqrt() / 4).max(3);
             for _ in 0..num_measure {
                 let measure_result = measure(
-                    i,
-                    center.0 as i32 - exit_cells[j].0 as i32,
-                    center.1 as i32 - exit_cells[j].1 as i32,
+                    j,
+                    center.0 as i32 - exit_cells[i].0 as i32,
+                    center.1 as i32 - exit_cells[i].1 as i32,
                     source,
                 );
                 if measure_result == -1 {
@@ -192,13 +201,13 @@ fn strategy2(
                 cnt += measure_result;
             }
             if cnt >= temps[center.0][center.1] * num_measure / 2 {
-                ans[i] = j;
+                ans[j] = i;
                 remaining.remove(&j);
                 break;
             }
         }
     }
-    ans[num_exit - 1] = *remaining.iter().next().unwrap();
+    ans[*remaining.iter().next().unwrap()] = num_exit - 1;
 
     // output results
     println!("-1 -1 -1");
