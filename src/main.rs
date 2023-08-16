@@ -33,7 +33,7 @@ fn main() {
 
     let mut temps = vec![vec![0; grid_size]; grid_size];
     let center = (grid_size / 2, grid_size / 2);
-    temps[center.0][center.1] = (10 * stdev).min(1000);
+    temps[center.0][center.1] = (8 * stdev).min(1000);
 
     // output temps
     for i in 0..grid_size {
@@ -69,7 +69,7 @@ fn main() {
                 continue;
             }
             let mut cnt = 0;
-            let num_measure = (stdev as f64 / 125.0).ceil().max(1.0) as i32;
+            let num_measure = (stdev as f64 / 100.0).ceil().max(1.0) as i32;
             for _ in 0..num_measure {
                 let measure_result = measure(
                     j,
