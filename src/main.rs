@@ -2,6 +2,7 @@ use proconio::{input, source::line::LineSource};
 use rand::seq::SliceRandom;
 use std::{
     collections::HashSet,
+    f64::consts::PI,
     io::{stdin, BufReader, StdinLock},
 };
 
@@ -17,6 +18,13 @@ fn measure(i: usize, x: i32, y: i32, source: &mut LineSource<BufReader<StdinLock
         measure_result: i32
     };
     return measure_result;
+}
+
+fn sqr<T>(x: T) -> T
+where
+    T: std::ops::Mul<Output = T> + Copy,
+{
+    x * x
 }
 
 fn main() {
@@ -68,9 +76,9 @@ fn main() {
             if !remaining.contains(&j) {
                 continue;
             }
-            let mut cnt = 0;
-            let num_measure = (stdev as f64 / 100.0).ceil().max(1.0) as i32;
-            for _ in 0..num_measure {
+            let acceptance = 0.995;
+            let mut percentage_one = 0.5;
+            while (percentage_one - 0.5_f64).abs() < (acceptance - 0.5_f64).abs() {
                 let measure_result = measure(
                     j,
                     center.0 as i32 - exit_cells[ordered_exitidx[i]].0 as i32,
@@ -78,11 +86,23 @@ fn main() {
                     &mut source,
                 );
                 if measure_result == -1 {
-                    continue;
+                    break;
                 }
-                cnt += measure_result;
+                let percentage_zero = 1.0 - percentage_one;
+                let t = temps[center.0][center.1];
+                let prob_one = if measure_result >= t {
+                    0.5
+                } else {
+                    (-sqr(measure_result - t) as f64 / (2 * sqr(stdev)) as f64).exp()
+                        / (2.0 * PI * sqr(stdev) as f64).sqrt()
+                };
+                let prob_zero = (-sqr(measure_result) as f64 / (2 * sqr(stdev)) as f64).exp()
+                    / (2.0 * PI * sqr(stdev) as f64).sqrt();
+                let sum = percentage_one * prob_one + percentage_zero * prob_zero;
+                percentage_one = percentage_one * prob_one / sum;
+                // eprintln!("{} {} {}", percentage_one, prob_one, measure_result);
             }
-            if cnt >= temps[center.0][center.1] * num_measure / 2 {
+            if percentage_one > acceptance {
                 ans[j] = ordered_exitidx[i];
                 remaining.remove(&j);
                 break;
