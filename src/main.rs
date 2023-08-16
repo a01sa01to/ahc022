@@ -69,7 +69,7 @@ fn main() {
                 continue;
             }
             let mut cnt = 0;
-            let num_measure = (stdev as f64 / 100.0).ceil().max(1.0) as i32;
+            let num_measure = (stdev as f64 / 125.0).ceil().max(1.0) as i32;
             for _ in 0..num_measure {
                 let measure_result = measure(
                     j,
