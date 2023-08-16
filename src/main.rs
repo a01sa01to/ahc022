@@ -27,6 +27,20 @@ where
     x * x
 }
 
+fn erfc(x: f64) -> f64 {
+    let mut res = 0.0;
+    let times = 1000;
+    for n in 0..times {
+        let t = 2.0 / PI.sqrt() * x / (2.0 * n as f64 + 1.0);
+        let mut u = 1.0;
+        for k in 1..(n + 1) {
+            u *= -(x * x) / k as f64;
+        }
+        res += t * u;
+    }
+    1.0 - res
+}
+
 fn main() {
     let stdin = stdin();
     let mut source = LineSource::new(BufReader::new(stdin.lock()));
@@ -69,6 +83,10 @@ fn main() {
                 + (exit_cells[*b].1 as i32 - center.1 as i32).abs()),
         )
     });
+
+    let erfcval =
+        1.0 - erfc(-temps[center.0][center.1] as f64 / (stdev as f64 * 2.0_f64.sqrt())) / 2.0;
+
     for i in 0..num_exit {
         perm.shuffle(&mut rng);
         for _j in 0..num_exit {
@@ -92,12 +110,20 @@ fn main() {
                 let t = temps[center.0][center.1];
                 let prob_one = if measure_result >= t {
                     0.5
+                } else if measure_result == 0 {
+                    erfcval
                 } else {
                     (-sqr(measure_result - t) as f64 / (2 * sqr(stdev)) as f64).exp()
                         / (2.0 * PI * sqr(stdev) as f64).sqrt()
                 };
-                let prob_zero = (-sqr(measure_result) as f64 / (2 * sqr(stdev)) as f64).exp()
-                    / (2.0 * PI * sqr(stdev) as f64).sqrt();
+                let prob_zero = if measure_result == 0 {
+                    0.5
+                } else if measure_result >= t {
+                    erfcval
+                } else {
+                    (-sqr(measure_result) as f64 / (2 * sqr(stdev)) as f64).exp()
+                        / (2.0 * PI * sqr(stdev) as f64).sqrt()
+                };
                 let sum = percentage_one * prob_one + percentage_zero * prob_zero;
                 percentage_one = percentage_one * prob_one / sum;
                 // eprintln!("{} {} {}", percentage_one, prob_one, measure_result);
