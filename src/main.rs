@@ -39,7 +39,7 @@ fn main() {
 
     let mut temps = vec![vec![0; grid_size]; grid_size];
     let center = (grid_size / 2, grid_size / 2);
-    temps[center.0][center.1] = (6 * stdev).min(1000);
+    temps[center.0][center.1] = (8 * stdev).min(1000);
 
     // output temps
     for i in 0..grid_size {
@@ -50,7 +50,8 @@ fn main() {
     }
 
     // measure
-    let mut ans = vec![0; num_exit];
+    let ans_undecided = 10000000;
+    let mut ans = vec![ans_undecided; num_exit];
     let mut remaining = HashSet::<usize>::new();
     for i in 0..num_exit {
         remaining.insert(i);
@@ -117,6 +118,25 @@ fn main() {
                 ans[j] = ordered_exitidx[i];
                 remaining.remove(&j);
                 break;
+            }
+        }
+    }
+
+    if remaining.len() > 0 {
+        let mut remaining = HashSet::<usize>::new();
+        for i in 0..num_exit {
+            remaining.insert(i);
+        }
+        for i in 0..num_exit {
+            if ans[i] != ans_undecided {
+                remaining.remove(&i);
+            }
+        }
+        eprintln!("remaining: {:?}", remaining);
+        let rem = remaining.iter().next().unwrap().clone();
+        for i in 0..num_exit {
+            if ans[i] == ans_undecided {
+                ans[i] = rem;
             }
         }
     }
