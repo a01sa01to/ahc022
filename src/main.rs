@@ -78,7 +78,7 @@ fn main() {
             }
             let one_acceptance = 0.995;
             let zero_acceptance = 0.90;
-            let mut percentage_one = 0.15;
+            let mut percentage_one = 0.35;
             while percentage_one < one_acceptance && (1.0 - percentage_one) < zero_acceptance {
                 let measure_result = measure(
                     j,
