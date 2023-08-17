@@ -75,9 +75,10 @@ fn main() {
             if !remaining.contains(&j) {
                 continue;
             }
-            let acceptance = 0.995;
+            let one_acceptance = 0.995;
+            let zero_acceptance = if stdev >= 400 { 0.90 } else { 0.99 };
             let mut percentage_one = 0.5;
-            while percentage_one < acceptance && percentage_one > 0.1 {
+            while percentage_one < one_acceptance && (1.0 - percentage_one) < zero_acceptance {
                 let measure_result = measure(
                     j,
                     center.0 as i32 - exit_cells[ordered_exitidx[i]].0 as i32,
@@ -112,7 +113,7 @@ fn main() {
                 //     percentage_one, prob_one, prob_zero, measure_result
                 // );
             }
-            if percentage_one > acceptance {
+            if percentage_one > one_acceptance {
                 ans[j] = ordered_exitidx[i];
                 remaining.remove(&j);
                 break;
