@@ -3,7 +3,6 @@ use proconio::{input, source::line::LineSource};
 use rand::seq::SliceRandom;
 use std::{
     collections::HashSet,
-    f64::consts::PI,
     io::{stdin, BufReader, StdinLock},
 };
 
@@ -21,11 +20,9 @@ fn measure(i: usize, x: i32, y: i32, source: &mut LineSource<BufReader<StdinLock
     return measure_result;
 }
 
-fn sqr<T>(x: T) -> T
-where
-    T: std::ops::Mul<Output = T> + Copy,
-{
-    x * x
+// P(X <= x)
+fn prob(x: f64, stdev: i32) -> f64 {
+    erfc(-x / (stdev as f64 * 2.0_f64.sqrt())) / 2.0
 }
 
 fn main() {
@@ -71,8 +68,6 @@ fn main() {
         )
     });
 
-    let erfcval = erfc(temps[center.0][center.1] as f64 / (stdev as f64 * 2.0_f64.sqrt())) / 2.0;
-
     for i in 0..num_exit {
         perm.shuffle(&mut rng);
         for _j in 0..num_exit {
@@ -95,24 +90,27 @@ fn main() {
                 let percentage_zero = 1.0 - percentage_one;
                 let t = temps[center.0][center.1];
                 let prob_one = if measure_result >= t {
-                    0.5
+                    prob(0.5, stdev)
                 } else if measure_result == 0 {
-                    erfcval
+                    prob(-t as f64 + 0.5, stdev)
                 } else {
-                    (-sqr(measure_result - t) as f64 / (2 * sqr(stdev)) as f64).exp()
-                        / (2.0 * PI * sqr(stdev) as f64).sqrt()
+                    prob((measure_result - t) as f64 + 0.5, stdev)
+                        - prob((measure_result - t) as f64 - 0.5, stdev)
                 };
                 let prob_zero = if measure_result == 0 {
-                    0.5
+                    prob(0.5, stdev)
                 } else if measure_result >= t {
-                    erfcval
+                    prob(-t as f64 + 0.5, stdev)
                 } else {
-                    (-sqr(measure_result) as f64 / (2 * sqr(stdev)) as f64).exp()
-                        / (2.0 * PI * sqr(stdev) as f64).sqrt()
+                    prob(-measure_result as f64 + 0.5, stdev)
+                        - prob(-measure_result as f64 - 0.5, stdev)
                 };
                 let sum = percentage_one * prob_one + percentage_zero * prob_zero;
                 percentage_one = percentage_one * prob_one / sum;
-                // eprintln!("{} {} {}", percentage_one, prob_one, measure_result);
+                // eprintln!(
+                //     "P1:{}, prob1:{}, prob0:{} res:{}",
+                //     percentage_one, prob_one, prob_zero, measure_result
+                // );
             }
             if percentage_one > acceptance {
                 ans[j] = ordered_exitidx[i];
