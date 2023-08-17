@@ -1,3 +1,4 @@
+use libm::erfc;
 use proconio::{input, source::line::LineSource};
 use rand::seq::SliceRandom;
 use std::{
@@ -25,20 +26,6 @@ where
     T: std::ops::Mul<Output = T> + Copy,
 {
     x * x
-}
-
-fn erfc(x: f64) -> f64 {
-    let mut res = 0.0;
-    let times = 1000;
-    for n in 0..times {
-        let t = 2.0 / PI.sqrt() * x / (2.0 * n as f64 + 1.0);
-        let mut u = 1.0;
-        for k in 1..(n + 1) {
-            u *= -(x * x) / k as f64;
-        }
-        res += t * u;
-    }
-    1.0 - res
 }
 
 fn main() {
@@ -84,8 +71,7 @@ fn main() {
         )
     });
 
-    let erfcval =
-        1.0 - erfc(-temps[center.0][center.1] as f64 / (stdev as f64 * 2.0_f64.sqrt())) / 2.0;
+    let erfcval = erfc(temps[center.0][center.1] as f64 / (stdev as f64 * 2.0_f64.sqrt())) / 2.0;
 
     for i in 0..num_exit {
         perm.shuffle(&mut rng);
