@@ -39,7 +39,7 @@ fn main() {
 
     let mut temps = vec![vec![0; grid_size]; grid_size];
     let center = (grid_size / 2, grid_size / 2);
-    temps[center.0][center.1] = (8 * stdev).min(1000);
+    temps[center.0][center.1] = (6 * stdev).min(1000);
 
     // output temps
     for i in 0..grid_size {
@@ -76,7 +76,7 @@ fn main() {
                 continue;
             }
             let one_acceptance = 0.995;
-            let zero_acceptance = if stdev >= 450 { 0.90 } else { 0.99 };
+            let zero_acceptance = 0.90;
             let mut percentage_one = 0.5;
             while percentage_one < one_acceptance && (1.0 - percentage_one) < zero_acceptance {
                 let measure_result = measure(
