@@ -77,7 +77,7 @@ fn main() {
             }
             let acceptance = 0.995;
             let mut percentage_one = 0.5;
-            while (percentage_one - 0.5_f64).abs() < (acceptance - 0.5_f64).abs() {
+            while percentage_one < acceptance && percentage_one > 0.1 {
                 let measure_result = measure(
                     j,
                     center.0 as i32 - exit_cells[ordered_exitidx[i]].0 as i32,
