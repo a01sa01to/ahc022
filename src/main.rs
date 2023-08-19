@@ -59,7 +59,7 @@ fn main() {
 
     let mut rng = rand::thread_rng();
     let mut ordered_exitidx = (0..num_exit).collect::<Vec<usize>>();
-    let mut perm = (0..num_exit).collect::<Vec<usize>>();
+    // let mut perm = (0..num_exit).collect::<Vec<usize>>();
     ordered_exitidx.sort_by(|a, b| {
         ((exit_cells[*a].0 as i32 - center.0 as i32).abs()
             + (exit_cells[*a].1 as i32 - center.1 as i32).abs())
@@ -70,9 +70,10 @@ fn main() {
     });
 
     for i in 0..num_exit {
-        perm.shuffle(&mut rng);
-        for _j in 0..num_exit {
-            let j = perm[_j];
+        // perm.shuffle(&mut rng);
+        // for _j in 0..num_exit {
+        for j in 0..num_exit {
+            // let j = perm[_j];
             if !remaining.contains(&j) {
                 continue;
             }
