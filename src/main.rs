@@ -1,6 +1,5 @@
 use libm::erfc;
 use proconio::{input, source::line::LineSource};
-use rand::seq::SliceRandom;
 use std::{
     collections::HashSet,
     io::{stdin, BufReader, StdinLock},
@@ -57,7 +56,6 @@ fn main() {
         remaining.insert(i);
     }
 
-    let mut rng = rand::thread_rng();
     let mut ordered_exitidx = (0..num_exit).collect::<Vec<usize>>();
     // let mut perm = (0..num_exit).collect::<Vec<usize>>();
     ordered_exitidx.sort_by(|a, b| {
@@ -70,10 +68,7 @@ fn main() {
     });
 
     for i in 0..num_exit {
-        // perm.shuffle(&mut rng);
-        // for _j in 0..num_exit {
         for j in 0..num_exit {
-            // let j = perm[_j];
             if !remaining.contains(&j) {
                 continue;
             }
@@ -110,10 +105,6 @@ fn main() {
                 };
                 let sum = percentage_one * prob_one + percentage_zero * prob_zero;
                 percentage_one = percentage_one * prob_one / sum;
-                // eprintln!(
-                //     "P1:{}, prob1:{}, prob0:{} res:{}",
-                //     percentage_one, prob_one, prob_zero, measure_result
-                // );
             }
             if percentage_one > one_acceptance {
                 ans[j] = ordered_exitidx[i];
