@@ -76,8 +76,8 @@ fn main() {
             if !remaining.contains(&j) {
                 continue;
             }
-            let one_acceptance = 0.999;
-            let zero_acceptance = 0.90;
+            let one_acceptance = 0.9999;
+            let zero_acceptance = 0.85;
             let mut percentage_one = 0.35;
             while percentage_one < one_acceptance && (1.0 - percentage_one) < zero_acceptance {
                 let measure_result = measure(
